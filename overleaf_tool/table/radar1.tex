@@ -1,0 +1,124 @@
+\documentclass[tikz, border=2pt]{standalone}
+\usepackage[margin=1in]{geometry} % Added geometry for better page usage
+\usepackage{booktabs} % For professional quality tables (\toprule, \midrule, \bottomrule)
+\usepackage{multirow} % For multi-row cells
+\usepackage{makecell} % For multi-line cells and better vertical spacing in cells
+\usepackage{amsmath} % For \text command if needed inside math mode
+\usepackage{graphicx} % For \resizebox if needed, or including images
+
+% \usepackage{booktabs} % Already loaded
+% \usepackage{amsmath}  % Already loaded
+\usepackage{siunitx}  % For better number alignment (optional but recommended)
+
+\usepackage{tikz}
+\usepackage{pgf-pie} % Package for creating pie charts
+% \usepackage[margin=1in]{geometry} % Already loaded
+\usepackage{caption} % For captions
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17} % Use a recent compatibility level
+\usetikzlibrary{pgfplots.polar}
+\usepgfplotslibrary{polar}
+% Define the green color used in the original image for percentages (optional)
+\definecolor{ForestGreen}{RGB}{34, 139, 34}
+% \definecolor{Red}{RGB}{255, 0, 0} % Standard red is already defined
+% Define abbreviations for GameQA categories using makecell for two lines
+\newcommand{\catA}{\makecell{3D Spatial \\ Perc. \& Under.}}
+\newcommand{\catB}{\makecell{Pattern Recog. \\ \& Matching}}
+\newcommand{\catC}{\makecell{Multi-step \\ Reasoning}}
+\newcommand{\catD}{\makecell{Strategic \\ Planning}}
+
+\begin{document}
+	
+	\colorlet{NoChangeColor}{gray!20}
+	\colorlet{ImprovedColor}{green!90!gray!30}
+	\colorlet{DeclinedColor}{orange!60!brown!30}
+	
+	% Define new milder colors for the plot series
+	\definecolor{PlotColor1}{RGB}{50, 90, 165} % Milder Blue for v20_5k
+	\definecolor{PlotColor2}{RGB}{165, 93, 93} % Milder Red/Coral for v20_1000
+	\definecolor{PlotColor3}{RGB}{92, 164, 53} % Milder Green/Teal for v20_500
+	
+	% Define the labels and number of axes (common for both charts)
+	\def\axisLabels{{CharXiv, MMBench, MMMU, MMMU-Pro, MathVerse, MathVision, MathVista}}
+	\def\numAxes{7}
+	
+	
+	% --- Chart 1: Quantity Comparison ---
+	\begin{tikzpicture}
+		\begin{polaraxis}[
+			%title={},
+			xtick={0.5*360/\numAxes, 1.5*360/\numAxes, 2.5*360/\numAxes, 3.5*360/\numAxes, 4.5*360/\numAxes, 5.5*360/\numAxes, 6.5*360/\numAxes},
+			xticklabels/.expand once=\axisLabels,
+			%xticklabel style={anchor=\tick+180},
+			% --- Adjusted y-axis ---
+			ymin = -1.5, % Set minimum below the lowest negative value
+			ymax = 3.0,  % Adjust max accordingly
+			ytick style={draw=none},
+			%ytick={-1, 0, 1, 2, 3}, % Explicitly add ticks, including 0
+			yticklabel pos=left,
+			yticklabel style={opacity=0},
+			%yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=1,xshift=-3pt},
+			y coord trafo/.code=\pgfmathparse{#1+1.5},
+			y coord inv trafo/.code=\pgfmathparse{#1-1.5},
+			ylabel = {Improvement (\%)},
+			ylabel style={opacity=0,xshift=95pt,yshift=-23pt},
+			axis y line=none,
+			grid = both,
+			legend pos=outer north east,
+			legend style={yshift=1em}
+			]
+			
+			% v20_5k (qwen2.5vl-3b_full_Games_grpo_new_v20_5k_)
+			\addplot+ [
+			thick, mark=*, color=PlotColor1, % Line and marker style
+			fill=PlotColor1, fill opacity=0.07 % Fill style
+			] coordinates {
+				(0.5*360/\numAxes, 0.08+1) (1.5*360/\numAxes, 2.15*5.5-9.5) (2.5*360/\numAxes, 1.22)
+				(3.5*360/\numAxes, -0.14*10+4) (4.5*360/\numAxes, -0.02+1) (5.5*360/\numAxes, 1.11*2)
+				(6.5*360/\numAxes, 1.82*2-1) 
+				(7.5*360/\numAxes, 0.08+1) % This closes the path by repeating the first point's y-value at an angle equivalent to the first
+			};
+			\addlegendentry{5000}
+			
+			% v20_1000 (qwen2.5vl-3b_full_Games_new_v20_1000_sam)
+			\addplot+ [
+			thick, mark=square*, color=PlotColor2, % Line and marker style
+			fill=PlotColor2, fill opacity=0.07 % Fill style
+			] coordinates {
+				(0.5*360/\numAxes, 0.17+1) (1.5*360/\numAxes, 2.02*5.5-9.5) (2.5*360/\numAxes, 1.52)
+				(3.5*360/\numAxes, -0.27*10+4) (4.5*360/\numAxes, -0.36+1) (5.5*360/\numAxes, -0.54*2)
+				(6.5*360/\numAxes, 0.68*2-1)
+				(7.5*360/\numAxes, 0.17+1) % Close the path
+			};
+			\addlegendentry{1000}
+			
+			% v20_500 (qwen2.5vl-3b_full_Games_new_v20_500_samp)
+			\addplot+ [
+			thick, mark=triangle*, color=PlotColor3, % Line and marker style
+			fill=PlotColor3, fill opacity=0.07 % Fill style
+			] coordinates {
+				(0.5*360/\numAxes, 0.58+1) (1.5*360/\numAxes, 1.59*5.5-9.5) (2.5*360/\numAxes, 0.23)
+				(3.5*360/\numAxes, -0.46*10+4) (4.5*360/\numAxes, 0.50+1) (5.5*360/\numAxes, 0.68*2)
+				(6.5*360/\numAxes, 0.65*2-1)
+				(7.5*360/\numAxes, 0.58+1) % Close the path
+			};
+			\addlegendentry{500}
+			
+			% Axis 1 (CharXiv): Max Abs Score 28.58 (v20_500, Impr: 0.58)
+			\node[font=\large, color=PlotColor3, anchor=south west, xshift=1pt] at (axis cs: {0.5*360/\numAxes}, 0.58+1) {28.6};
+			% Axis 2 (MMBench): Max Abs Score 77.68 (v20_5k, Impr: 2.15)
+			\node[font=\large, color=PlotColor1, anchor=west] at (axis cs: {1.5*360/\numAxes}, 2.15+0.1) {77.7};
+			% Axis 3 (MMMU): Max Abs Score 42.36 (v20_1000, Impr: 1.52)
+			\node[font=\large, color=PlotColor2, anchor=north west] at (axis cs: {2.5*360/\numAxes}, 2.52) {42.4};
+			% Axis 4 (MMMU-Pro): Max Abs Score 30.83 (v20_5k, Impr: -0.14)
+			\node[font=\large, color=PlotColor1, anchor=north east, xshift=-4pt,yshift=-7pt] at (axis cs: {3.5*360/\numAxes}, 1.54) {30.8};
+			% Axis 5 (MathVerse): Max Abs Score 33.90 (v20_500, Impr: 0.50)
+			\node[font=\large, color=PlotColor3, anchor=south east] at (axis cs: {4.5*360/\numAxes}, 0.70+1) {33.9};
+			% Axis 6 (MathVision): Max Abs Score 28.79 (v20_5k, Impr: 1.11)
+			\node[font=\large, color=PlotColor1, anchor=east] at (axis cs: {5.5*360/\numAxes}, 2.11+0.2) {28.8};
+			% Axis 7 (MathVista): Max Abs Score 54.42 (v20_5k, Impr: 1.82)
+			\node[font=\large, color=PlotColor1, anchor=south west,xshift=4pt,yshift=3pt] at (axis cs: {6.5*360/\numAxes}, 1.82) {54.4};
+		\end{polaraxis}
+	\end{tikzpicture}
+	
+\end{document}

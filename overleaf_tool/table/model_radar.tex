@@ -1,0 +1,193 @@
+\documentclass[tikz, border=2pt]{standalone}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usepackage{pgf-pie}
+\usepackage{caption}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usetikzlibrary{pgfplots.polar}
+\usepgfplotslibrary{polar}
+
+% 定义每个维度的归一化函数 - 针对instruction模型，最小值为30，最大值为90
+\pgfmathdeclarefunction{normalizeES}{1}{%
+    \pgfmathparse{30 + 60 * (#1 - 0.5835347222222222) / (0.6721097733285233 - 0.5835347222222222)}%
+}
+\pgfmathdeclarefunction{normalizeLC}{1}{%
+    \pgfmathparse{30 + 60 * (#1 - 0.7581302722895962) / (0.9484797228048838 - 0.7581302722895962)}%
+}
+\pgfmathdeclarefunction{normalizeAIA}{1}{%
+    \pgfmathparse{30 + 60 * (#1 - 0.8588595323438638) / (0.8881825006789188 - 0.8588595323438638)}%
+}
+\pgfmathdeclarefunction{normalizeAS}{1}{%
+    \pgfmathparse{30 + 60 * (#1 - 0.8556424401435588) / (0.8925215121111658 - 0.8556424401435588)}%
+}
+\pgfmathdeclarefunction{normalizeQA}{1}{%
+    \pgfmathparse{30 + 60 * (#1 - 0.7432254107739408) / (0.8715272788075743 - 0.7432254107739408)}%
+}
+\pgfmathdeclarefunction{normalizeTC}{1}{%
+    \pgfmathparse{30 + 60 * (#1 - 0.9280898187143509) / (0.9493245954299709 - 0.9280898187143509)}%
+}
+\pgfmathdeclarefunction{normalizeSS}{1}{%
+    \pgfmathparse{30 + 60 * (#1 - 0.8947143032128764) / (0.9541230621912942 - 0.8947143032128764)}%
+}
+\pgfmathdeclarefunction{normalizeEC}{1}{%
+    \pgfmathparse{30 + 60 * (#1 - 0.8970510823004071) / (0.9062939548187992 - 0.8970510823004071)}%
+}
+
+% 定义颜色
+\definecolor{GTColor}{RGB}{128, 128, 128}    % GT 灰色
+\definecolor{Model1Color}{RGB}{50, 90, 165}    % Gemini Flash
+\definecolor{Model2Color}{RGB}{165, 93, 93}    % Gemini Flash Lite
+\definecolor{Model3Color}{RGB}{92, 164, 53}    % InternLM
+\definecolor{Model4Color}{RGB}{128, 0, 128}    % Llama Maverick
+\definecolor{Model5Color}{RGB}{255, 165, 0}    % Llama Scout
+\definecolor{Model6Color}{RGB}{0, 128, 128}    % O3-mini
+\definecolor{Model7Color}{RGB}{139, 69, 19}    % O4-mini
+
+\begin{document}
+    \begin{tikzpicture}
+        \begin{polaraxis}[
+            width=12cm,
+            height=12cm,
+            xtick={0, 45, 90, 135, 180, 225, 270, 315},
+            xticklabels={
+                {Emotional\\Stability},
+                {Linguistic\\Consistency},
+                {Action Intention\\Alignment},
+                {Adjacent\\Similarity},
+                {QA\\Relevance},
+                {Topic\\Concentration},
+                {Scene\\Similarity},
+                {Event\\Coherence}
+            },
+            xticklabel style={font=\small},
+            ymin=0,
+            ymax=100,
+            ytick={0,20,40,60,80,100},
+            yticklabels={,,,,},
+            grid=both,
+            legend pos=outer north east,
+            legend style={font=\small},
+            ]
+
+            % GT
+            \addplot+[mark=*, thick, color=GTColor, fill opacity=0, line width=1.5pt] coordinates {
+                (0, 90)
+                (45, 90)
+                (90, 90)
+                (135, 90)
+                (180, 90)
+                (225, 90)
+                (270, 90)
+                (315, 90)
+                (360, 90)
+            };
+            \addlegendentry{GT}
+
+            % Gemini Flash
+            \addplot+[mark=*, thick, color=Model1Color, fill opacity=0] coordinates {
+                (0, {normalizeES(0.6389421502109001)})
+                (45, {normalizeLC(0.9248722861395984)})
+                (90, {normalizeAIA(0.8881825006789188)})
+                (135, {normalizeAS(0.8824087396338656)})
+                (180, {normalizeQA(0.8715272788075743)})
+                (225, {normalizeTC(0.9401901543970098)})
+                (270, {normalizeSS(0.9386653660022418)})
+                (315, {normalizeEC(0.9001694427905486)})
+                (360, {normalizeES(0.6389421502109001)})
+            };
+            \addlegendentry{Gemini Flash}
+
+            % Gemini Flash Lite
+            \addplot+[mark=square*, thick, color=Model2Color, fill opacity=0] coordinates {
+                (0, {normalizeES(0.653715918753865)})
+                (45, {normalizeLC(0.9236777726349276)})
+                (90, {normalizeAIA(0.8756009090839438)})
+                (135, {normalizeAS(0.8556424401435588)})
+                (180, {normalizeQA(0.8494331131972856)})
+                (225, {normalizeTC(0.9280898187143509)})
+                (270, {normalizeSS(0.9375255961877058)})
+                (315, {normalizeEC(0.9006735515700628)})
+                (360, {normalizeES(0.653715918753865)})
+            };
+            \addlegendentry{Gemini Flash Lite}
+
+            % InternLM
+            \addplot+[mark=triangle*, thick, color=Model3Color, fill opacity=0] coordinates {
+                (0, {normalizeES(0.5835347222222222)})
+                (45, {normalizeLC(0.8757113453614636)})
+                (90, {normalizeAIA(0.8588595323438638)})
+                (135, {normalizeAS(0.8866783750027699)})
+                (180, {normalizeQA(0.8663969694195817)})
+                (225, {normalizeTC(0.9428085249897451)})
+                (270, {normalizeSS(0.8947143032128764)})
+                (315, {normalizeEC(0.8970510823004071)})
+                (360, {normalizeES(0.5835347222222222)})
+            };
+            \addlegendentry{InternLM}
+
+            % Llama Maverick
+            \addplot+[mark=diamond*, thick, color=Model4Color, fill opacity=0] coordinates {
+                (0, {normalizeES(0.6287653006715507)})
+                (45, {normalizeLC(0.9182415410043179)})
+                (90, {normalizeAIA(0.8866333582737234)})
+                (135, {normalizeAS(0.8675710120727952)})
+                (180, {normalizeQA(0.8326383690366531)})
+                (225, {normalizeTC(0.9367009031089121)})
+                (270, {normalizeSS(0.9474815048539565)})
+                (315, {normalizeEC(0.9058801007908843)})
+                (360, {normalizeES(0.6287653006715507)})
+            };
+            \addlegendentry{Llama Maverick}
+
+            % Llama Scout
+            \addplot+[mark=pentagon*, thick, color=Model5Color, fill opacity=0] coordinates {
+                (0, {normalizeES(0.6721097733285233)})
+                (45, {normalizeLC(0.9484797228048838)})
+                (90, {normalizeAIA(0.8768926737938278)})
+                (135, {normalizeAS(0.871337738852177)})
+                (180, {normalizeQA(0.8509796800659167)})
+                (225, {normalizeTC(0.9367739306952144)})
+                (270, {normalizeSS(0.9318657752319299)})
+                (315, {normalizeEC(0.9062939548187992)})
+                (360, {normalizeES(0.6721097733285233)})
+            };
+            \addlegendentry{Llama Scout}
+
+            % O3-mini
+            \addplot+[mark=otimes*, thick, color=Model6Color, fill opacity=0] coordinates {
+                (0, {normalizeES(0.615375)})
+                (45, {normalizeLC(0.7581302722895962)})
+                (90, {normalizeAIA(0.8859923632468777)})
+                (135, {normalizeAS(0.8925215121111658)})
+                (180, {normalizeQA(0.7432254107739408)})
+                (225, {normalizeTC(0.9493245954299709)})
+                (270, {normalizeSS(0.9541230621912942)})
+                (315, {normalizeEC(0.8987876174735476)})
+                (360, {normalizeES(0.615375)})
+            };
+            \addlegendentry{O3-mini}
+
+            % O4-mini
+            \addplot+[mark=star*, thick, color=Model7Color, fill opacity=0] coordinates {
+                (0, {normalizeES(0.6597564784752282)})
+                (45, {normalizeLC(0.9345035397413325)})
+                (90, {normalizeAIA(0.8826321756361025)})
+                (135, {normalizeAS(0.8661861530831655)})
+                (180, {normalizeQA(0.8625903305291819)})
+                (225, {normalizeTC(0.931693535840956)})
+                (270, {normalizeSS(0.9534711400752532)})
+                (315, {normalizeEC(0.8975783766903562)})
+                (360, {normalizeES(0.6597564784752282)})
+            };
+            \addlegendentry{O4-mini}
+
+        \end{polaraxis}
+    \end{tikzpicture}
+\end{document} 
